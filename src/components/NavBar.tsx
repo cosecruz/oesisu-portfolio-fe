@@ -1,7 +1,7 @@
 import React from 'react'
 import { navLinks } from '../constants'
 
-const NavBar = () => {
+const NavBar: React.FC = () => {
   return (
     <header>
       <nav>

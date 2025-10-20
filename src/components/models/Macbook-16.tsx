@@ -9,9 +9,12 @@ Title: macbook pro M3 16 inch 2024
 */
 
 import * as THREE from 'three'
-import React, { type JSX } from 'react'
+import React, { useEffect, type JSX } from 'react'
 import { useGLTF, useTexture } from '@react-three/drei'
 import { type GLTF } from 'three-stdlib'
+import { Color, SRGBColorSpace } from 'three'
+import useMacBookStore from '../../store'
+import { noChangeParts } from '../../constants'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -59,8 +62,27 @@ type GLTFResult = GLTF & {
 }
 
 const  ModelMacbook16: React.FC<JSX.IntrinsicElements['group']> = (props)=> {
-  const { nodes, materials } = useGLTF('/models/macbook-16-transformed.glb') as unknown as GLTFResult
-  const texture = useTexture('/screen.png')
+
+   const { color } = useMacBookStore()
+    const { nodes, materials, scene } = useGLTF('/models/macbook-16-transformed.glb') as unknown as GLTFResult
+
+    const texture = useTexture('/screen.png')
+    texture.colorSpace = SRGBColorSpace
+    texture.needsUpdate = true
+
+    // ✅ Update material colors based on Zustand store
+    useEffect(() => {
+      scene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh
+          if (!noChangeParts.includes(mesh.name)) {
+            const mat = mesh.material as THREE.MeshStandardMaterial
+            mat.color = new Color(color)
+          }
+        }
+      })
+    }, [color, scene])
+
   return (
     <group {...props} dispose={null}>
       <mesh geometry={nodes.Object_10.geometry} material={materials.PaletteMaterial001} rotation={[Math.PI / 2, 0, 0]} />

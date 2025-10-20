@@ -5,7 +5,7 @@ import { useGSAP } from '@gsap/react'
 import * as THREE from 'three'
 import ModelMacbook16 from '../models/Macbook-16'
 import ModelMacbook14 from '../models/Macbook-14'
-import { useThree } from '@react-three/fiber'
+//import { useThree } from '@react-three/fiber'
 
 type Props = {
   scale: number
@@ -45,19 +45,19 @@ const moveGroup = (group: THREE.Group | null, x: number, rotationY: number) => {
 }
 
 // 🔹 Animate lid (if model has a “screen” or “lid” node)
-const openLaptopLid = (group: THREE.Group | null, angle: number) => {
-  if (!group) return
-  const lid = group.children.find(
-    (c) => c.name.toLowerCase().includes('screen') || c.name.toLowerCase().includes('lid')
-  )
-  if (lid) {
-    gsap.to(lid.rotation, { x: angle, duration: ANIMATION_DURATION, ease: 'power1.inOut' })
-  }
-}
+// const openLaptopLid = (group: THREE.Group | null, angle: number) => {
+//   if (!group) return
+//   const lid = group.children.find(
+//     (c) => c.name.toLowerCase().includes('screen') || c.name.toLowerCase().includes('lid')
+//   )
+//   if (lid) {
+//     gsap.to(lid.rotation, { x: angle, duration: ANIMATION_DURATION, ease: 'power1.inOut' })
+//   }
+// }
 
 // 🔹 Main component
 const ModelSwitcher: React.FC<Props> = ({ scale, isMobile }) => {
-  const { camera } = useThree()
+ // const { camera } = useThree()
   const smallMacbookRef = useRef<THREE.Group>(null)
   const largeMacbookRef = useRef<THREE.Group>(null)
 
@@ -68,33 +68,21 @@ const ModelSwitcher: React.FC<Props> = ({ scale, isMobile }) => {
 
   useGSAP(
     () => {
-      gsap.from([smallMacbookRef.current, largeMacbookRef.current], {
-  y: -2,
-  opacity: 0,
-  duration: 1.5,
-  ease: 'power3.out',
-  stagger: 0.3,
-})
+
       if (showLargeMacbook) {
-        gsap.to(camera.position, { z: 7, duration: ANIMATION_DURATION })
 
         moveGroup(smallMacbookRef.current, -OFFSET_DISTANCE, -ROTATION_ANGLE)
         moveGroup(largeMacbookRef.current, 0, 0)
 
         fadeMeshes(smallMacbookRef.current, 0)
         fadeMeshes(largeMacbookRef.current, 1)
-
-        openLaptopLid(largeMacbookRef.current, Math.PI / 3)
       } else {
-        gsap.to(camera.position, { z: 9, duration: ANIMATION_DURATION })
-
         moveGroup(smallMacbookRef.current, 0, 0)
         moveGroup(largeMacbookRef.current, OFFSET_DISTANCE, ROTATION_ANGLE)
 
         fadeMeshes(smallMacbookRef.current, 1)
         fadeMeshes(largeMacbookRef.current, 0)
 
-        openLaptopLid(smallMacbookRef.current, Math.PI / 4)
       }
     },
     { dependencies: [scale] }
